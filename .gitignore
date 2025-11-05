@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+
+# Environment variables
+.env
+.env.local
+
+# Build outputs
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Uploaded files
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Whisper models cache
+ai-models/.cache/
+
+# MongoDB
+data/

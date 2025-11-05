@@ -1,0 +1,3 @@
+git+https://github.com/openai/whisper.git
+transformers>=4.46.0
+torch

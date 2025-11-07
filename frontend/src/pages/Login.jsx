@@ -18,7 +18,6 @@ function Login({ setUser }) {
       const { data } = await api.post('/auth/login', { email, password });
       console.log('✅ Login API Response:', data);
 
-      // adjust if backend returns differently
       const userData = data.user || data;
       const token = data.token || userData.token;
 
@@ -39,40 +38,41 @@ function Login({ setUser }) {
     }
   };
 
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
-      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100">
+      <div className="bg-gray-900/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl w-full max-w-md border border-gray-700">
+        <h2 className="text-3xl font-extrabold text-center text-blue-400 mb-2">
           🎤 Meeting AI
         </h2>
-        <h3 className="text-xl text-center text-gray-600 mb-8">Login</h3>
+        <h3 className="text-xl text-center text-gray-300 mb-8">
+          Login to your account
+        </h3>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-900/30 border border-red-500 text-red-400 px-4 py-3 rounded mb-4 text-center">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-gray-700 font-medium mb-2">Email</label>
+            <label className="block text-gray-300 font-medium mb-2">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
 
           <div>
-            <label className="block text-gray-700 font-medium mb-2">Password</label>
+            <label className="block text-gray-300 font-medium mb-2">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -80,15 +80,15 @@ function Login({ setUser }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-95 disabled:opacity-50"
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
-        <p className="text-center text-gray-600 mt-6">
-          Don&apos;t have an account?{' '}
-          <Link to="/signup" className="text-blue-600 hover:underline">
+        <p className="text-center text-gray-400 mt-6">
+          Don’t have an account?{' '}
+          <Link to="/signup" className="text-blue-400 hover:underline hover:text-blue-300 transition">
             Sign up
           </Link>
         </p>

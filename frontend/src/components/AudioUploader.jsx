@@ -22,7 +22,7 @@ function AudioUploader({ onUploadSuccess }) {
     const validExt = /\.(mp3|wav|m4a|ogg|mp4|mov|mkv|webm)$/i;
 
     if (!allowedTypes.includes(selectedFile.type) && !validExt.test(selectedFile.name)) {
-      setError('Please upload a valid audio/video file (MP3, WAV, M4A, OGG, MP4, MOV, MKV, WEBM)');
+      setError('❌ Please upload a valid audio/video file (MP3, WAV, M4A, OGG, MP4, MOV, MKV, WEBM)');
       setFile(null);
       return;
     }
@@ -60,27 +60,24 @@ function AudioUploader({ onUploadSuccess }) {
         }
       );
 
-      setSuccess('File uploaded successfully! Starting AI processing...');
+      setSuccess('✅ File uploaded successfully! AI processing has started...');
       setProcessing(true);
       setProgress(0);
 
       let progressValue = 0;
       const progressInterval = setInterval(() => {
-        // smoothly simulate up to 80%
         if (progressValue < 80) {
           progressValue += 5;
           setProgress(progressValue);
         }
       }, 400);
 
-      // ✅ Trigger backend processing
       await axios.post(
         `http://localhost:5000/api/meetings/${data.meetingId}/process`,
         {},
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
 
-      // ✅ Poll backend for real completion
       const checkStatus = async () => {
         const res = await axios.get(
           `http://localhost:5000/api/meetings/${data.meetingId}/status`,
@@ -95,7 +92,6 @@ function AudioUploader({ onUploadSuccess }) {
         await new Promise((r) => setTimeout(r, 3000));
         status = await checkStatus();
         attempts++;
-
         if (progressValue < 95) {
           progressValue += 1;
           setProgress(progressValue);
@@ -104,9 +100,7 @@ function AudioUploader({ onUploadSuccess }) {
 
       clearInterval(progressInterval);
       setProgress(100);
-      setSuccess('✅ Processing completed successfully!');
-
-      // Wait a bit before closing loader for smoother UI
+      setSuccess('🎉 Processing completed successfully!');
       setTimeout(() => setProcessing(false), 800);
 
       setFile(null);
@@ -125,79 +119,71 @@ function AudioUploader({ onUploadSuccess }) {
     <>
       {/* 🌀 Fullscreen Loader Overlay */}
       {processing && (
-        <div className="fixed inset-0 bg-white/70 backdrop-blur-md flex flex-col items-center justify-center z-[1000] transition-all duration-300">
-          <div className="bg-white shadow-2xl rounded-2xl p-8 flex flex-col items-center w-[90%] sm:w-[400px] text-center border border-gray-100">
-            {/* Animated circular loader */}
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center z-[1000] transition-all duration-300">
+          <div className="bg-gray-900/90 shadow-2xl rounded-2xl p-8 flex flex-col items-center w-[90%] sm:w-[400px] text-center border border-gray-700">
             <div className="relative w-16 h-16">
-              <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
-              <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <div className="absolute inset-0 border-4 border-gray-700 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
 
-            <h3 className="mt-4 text-xl font-semibold text-gray-800">
-              Processing your file...
-            </h3>
-            <p className="text-sm text-gray-500 mt-1 mb-4">
+            <h3 className="mt-5 text-xl font-semibold text-white">Processing your file...</h3>
+            <p className="text-sm text-gray-400 mt-1 mb-4">
               Please wait while AI works its magic ✨
             </p>
 
-            {/* Progress bar */}
-            <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-2">
+            <div className="w-full bg-gray-800 h-3 rounded-full overflow-hidden mb-2">
               <div
                 className="h-3 bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
 
-            <p className="text-gray-700 text-sm font-medium">{progress}% completed</p>
+            <p className="text-gray-300 text-sm font-medium">{progress}% completed</p>
           </div>
         </div>
       )}
 
-      {/* Main Uploader */}
-      <div className="bg-white rounded-lg shadow-lg p-6 relative z-10">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          📤 Upload Meeting Audio/Video
+      {/* 🔲 Dark Themed Main Uploader Container */}
+      <div className="bg-gray-900 border border-gray-700 shadow-2xl rounded-2xl p-8 mt-20 max-w-2xl mx-auto text-white">
+        <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          📤 Upload Meeting Recording
         </h2>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-900/50 border border-red-500 text-red-300 px-4 py-3 rounded-lg mb-4 text-sm animate-pulse">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          <div className="bg-green-900/50 border border-green-500 text-green-300 px-4 py-3 rounded-lg mb-4 text-sm animate-fadeIn">
             {success}
           </div>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Meeting Title (Optional)
-            </label>
+            <label className="block text-gray-300 font-medium mb-2">Meeting Title (Optional)</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Team Standup - Nov 3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="e.g., Team Sync - Nov 7"
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             />
           </div>
 
           <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Audio or Video File
-            </label>
+            <label className="block text-gray-300 font-medium mb-2">Audio or Video File</label>
             <input
               type="file"
               accept=".mp3,.wav,.m4a,.ogg,.mp4,.mov,.mkv,.webm,audio/*,video/*"
               onChange={handleFileChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
             />
             {file && (
-              <p className="mt-2 text-sm text-gray-600">
-                Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+              <p className="mt-2 text-sm text-gray-400">
+                Selected: <span className="text-blue-400">{file.name}</span> ({(file.size / 1024 / 1024).toFixed(2)} MB)
               </p>
             )}
           </div>
@@ -205,17 +191,13 @@ function AudioUploader({ onUploadSuccess }) {
           <button
             onClick={handleUpload}
             disabled={uploading || processing || !file}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white py-3 rounded-lg font-semibold hover:scale-[1.03] hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {uploading
-              ? 'Uploading...'
-              : processing
-                ? 'Processing...'
-                : 'Upload & Process'}
+            {uploading ? 'Uploading...' : processing ? 'Processing...' : 'Upload & Process'}
           </button>
 
           <p className="text-xs text-gray-500 text-center">
-            Supported formats: Audio (MP3, WAV, M4A, OGG) and Video (MP4, MOV, MKV, WEBM)
+            Supported formats: MP3, WAV, M4A, OGG, MP4, MOV, MKV, WEBM
           </p>
         </div>
       </div>

@@ -56,10 +56,10 @@ function Dashboard({ user, setUser }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 flex flex-col relative">
       {/* 🔝 Promo Banner */}
-      <PromoBanner
+      {/* <PromoBanner
         message="🔥 Exclusive Offer! Get lifetime AI Meeting Summaries access at 60% OFF — Limited Time Only!"
         gradient="from-indigo-600 via-purple-600 to-pink-600"
-      />
+      /> */}
 
       {/* 🧭 Header — dynamically shows completed meetings */}
       <Header

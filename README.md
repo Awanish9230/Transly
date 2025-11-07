@@ -87,7 +87,6 @@ python -m venv venv
 
 # Install Python dependencies
 pip install -r requirements.txt
-pip install -r requirements.txt
 
 
 # This will download ~2-3GB of AI models on first run

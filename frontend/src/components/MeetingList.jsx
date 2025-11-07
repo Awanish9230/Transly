@@ -33,7 +33,15 @@ function MeetingList({ meetings, loading, navigate }) {
       <h2 className="text-2xl font-bold text-white mb-6 text-center">
         🗂️ Your Meetings
       </h2>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+      {/* 🔳 Scrollable Grid Container */}
+      <div
+        className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 overflow-y-auto pr-2 custom-scroll"
+        style={{
+          maxHeight: "900px", // shows roughly 9 cards (3 rows × 3 columns)
+          paddingRight: "6px",
+        }}
+      >
         {meetings.map((meeting) => (
           <MeetingCard
             key={meeting._id}

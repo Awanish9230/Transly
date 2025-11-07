@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import jsPDF from "jspdf";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 function PublicReport() {
   const { token } = useParams();
@@ -96,87 +97,99 @@ function PublicReport() {
 
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-gray-300">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mr-3"></div>
-        Loading Report...
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-black text-gray-300">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          <p className="mt-4">Loading report...</p>
+        </div>
       </div>
     );
 
   if (!meeting)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-red-400 text-lg">
-        ❌ Link invalid or report unavailable.
+      <div className="min-h-screen flex items-center justify-center text-red-500 bg-gradient-to-b from-gray-900 to-black">
+        Invalid or unavailable report.
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-gray-200">
-      {/* Header */}
-      <header className="bg-gray-900/80 backdrop-blur-md border-b border-gray-700/40 shadow-lg sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-gray-100 pt-[140px]">
+
+
+      {/* 🔹 Fixed Header */}
+      <header className="w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-700 shadow-md">
+
+        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+          <motion.h1
+            whileHover={{ scale: 1.05 }}
+            className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent"
+          >
             {meeting.title}
-          </h1>
+          </motion.h1>
+
           <button
             onClick={exportToPDF}
-            className="bg-gradient-to-r from-green-600 to-emerald-700 text-white px-5 py-2 rounded-lg 
-                     hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium"
+            className="bg-gradient-to-r from-green-600 to-emerald-500 text-white px-4 py-2 rounded-lg font-semibold hover:scale-105 hover:shadow-lg transition-all duration-200"
           >
             📄 Export PDF
           </button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 py-10 space-y-8">
-        {/* Summary Section */}
-        <section className="bg-gray-900/70 backdrop-blur-md border border-gray-700/40 rounded-2xl shadow-lg p-6 hover:border-indigo-500/40 transition-all duration-300">
-          <h2 className="text-xl font-semibold text-indigo-400 mb-3">
-            📝 Summary
-          </h2>
+      {/* 🌙 Main Content (add spacing for header) */}
+      <main className="max-w-5xl mx-auto px-4 mt-[40px] pb-10 space-y-8">
+
+        {/* 📝 Summary Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-gray-900/70 border border-gray-700 rounded-2xl p-6 shadow-lg hover:border-indigo-500/50 transition"
+        >
+          <h2 className="text-xl font-bold text-indigo-400 mb-2">📝 Summary</h2>
           <p className="text-gray-300 leading-relaxed">
             {meeting.summary || "No summary available."}
           </p>
-        </section>
+        </motion.section>
 
-        {/* Action Items */}
-        {meeting.tasks && meeting.tasks.length > 0 && (
-          <section className="bg-gray-900/70 backdrop-blur-md border border-gray-700/40 rounded-2xl shadow-lg p-6 hover:border-indigo-500/40 transition-all duration-300">
-            <h2 className="text-xl font-semibold text-indigo-400 mb-3">
-              ✅ Action Items
-            </h2>
+        {/* ✅ Action Items Section */}
+        {meeting.tasks?.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="bg-gray-900/70 border border-gray-700 rounded-2xl p-6 shadow-lg hover:border-indigo-500/50 transition"
+          >
+            <h2 className="text-xl font-bold text-indigo-400 mb-3">✅ Action Items</h2>
             <ul className="space-y-3">
               {meeting.tasks.map((t, i) => (
                 <li
                   key={i}
-                  className="border border-gray-700/50 bg-gray-800/70 rounded-lg p-4 hover:bg-gray-800/90 transition"
+                  className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 hover:bg-gray-800/80 transition-all duration-300"
                 >
-                  <div className="font-medium text-gray-100 mb-1">
-                    {t.description}
-                  </div>
-                  <div className="text-sm text-gray-400">
-                    👤 {t.assignedTo || "Unassigned"} · 📅{" "}
-                    {t.deadline || "No deadline"} · 🔖{" "}
-                    {t.priority || "Normal"}
+                  <div className="font-medium text-white">{t.description}</div>
+                  <div className="text-sm text-gray-400 mt-1">
+                    👤 {t.assignedTo} · 📅 {t.deadline} · 🔖 {t.priority}
                   </div>
                 </li>
               ))}
             </ul>
-          </section>
+          </motion.section>
         )}
 
-        {/* Full Transcript */}
+        {/* 📜 Transcript Section */}
         {meeting.transcript && (
-          <section className="bg-gray-900/70 backdrop-blur-md border border-gray-700/40 rounded-2xl shadow-lg p-6 hover:border-indigo-500/40 transition-all duration-300">
-            <h2 className="text-xl font-semibold text-indigo-400 mb-3">
-              📄 Full Transcript
-            </h2>
-            <div className="bg-gray-800/80 border border-gray-700/40 rounded-lg p-4 max-h-[400px] overflow-y-auto custom-scroll">
-              <p className="whitespace-pre-wrap text-gray-300 leading-relaxed">
-                {meeting.transcript}
-              </p>
+          <motion.section
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="bg-gray-900/70 border border-gray-700 rounded-2xl p-6 shadow-lg hover:border-indigo-500/50 transition"
+          >
+            <h2 className="text-xl font-bold text-indigo-400 mb-3">📄 Full Transcript</h2>
+            <div className="bg-gray-800/70 rounded-lg p-4 max-h-[450px] overflow-y-auto custom-scroll text-gray-300">
+              <p className="whitespace-pre-wrap">{meeting.transcript}</p>
             </div>
-          </section>
+          </motion.section>
         )}
       </main>
     </div>

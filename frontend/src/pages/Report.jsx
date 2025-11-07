@@ -18,7 +18,7 @@ function Report({ user, setUser }) {
     "✅ Finalizing report...",
   ];
 
-  // 🔁 Rotate AI steps
+  // Rotate AI steps
   useEffect(() => {
     if (!meeting || meeting.status !== "processing") return;
     let index = 0;
@@ -30,7 +30,7 @@ function Report({ user, setUser }) {
     return () => clearInterval(interval);
   }, [meeting?.status]);
 
-  // 🧠 Fetch meeting data
+  // Fetch meeting data
   useEffect(() => {
     const fetchMeeting = async () => {
       try {
@@ -52,7 +52,7 @@ function Report({ user, setUser }) {
     fetchMeeting();
   }, [id]);
 
-  // ⏱ Poll while processing
+  // Polling while processing
   useEffect(() => {
     if (!id || meeting?.status !== "processing") return;
     const interval = setInterval(async () => {
@@ -70,8 +70,9 @@ function Report({ user, setUser }) {
     navigate("/login");
   };
 
-  // 📄 Export PDF
+  // Export to PDF
   const exportToPDF = () => {
+    if (!meeting) return;
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 20;
@@ -87,7 +88,6 @@ function Report({ user, setUser }) {
     doc.setFontSize(14);
     doc.text("Summary", margin, y);
     y += 7;
-
     doc.setFontSize(10);
     const summaryLines = doc.splitTextToSize(
       meeting.summary || "No summary available",
@@ -100,14 +100,13 @@ function Report({ user, setUser }) {
       doc.setFontSize(14);
       doc.text("Action Items", margin, y);
       y += 7;
-
       doc.setFontSize(10);
-      meeting.tasks.forEach((task, index) => {
+      meeting.tasks.forEach((task, i) => {
         if (y > 270) {
           doc.addPage();
           y = 20;
         }
-        doc.text(`${index + 1}. ${task.description}`, margin, y);
+        doc.text(`${i + 1}. ${task.description}`, margin, y);
         y += 5;
         doc.text(
           `   Assigned: ${task.assignedTo} | Deadline: ${task.deadline} | Priority: ${task.priority}`,
@@ -125,11 +124,11 @@ function Report({ user, setUser }) {
       doc.text("Full Transcript", margin, y);
       y += 7;
       doc.setFontSize(10);
-      const transcriptLines = doc.splitTextToSize(
+      const lines = doc.splitTextToSize(
         meeting.transcript,
         pageWidth - 2 * margin
       );
-      transcriptLines.forEach((line) => {
+      lines.forEach((line) => {
         if (y > 280) {
           doc.addPage();
           y = 20;
@@ -157,7 +156,7 @@ function Report({ user, setUser }) {
     setShareInfo({ url, enabled: true });
     try {
       await navigator.clipboard.writeText(url);
-      alert("Share link copied to clipboard");
+      alert("Share link copied to clipboard!");
     } catch {}
   };
 
@@ -166,7 +165,7 @@ function Report({ user, setUser }) {
     setShareInfo({ url: "", enabled: false });
   };
 
-  // 🔄 Processing Loader
+  // Processing animation
   if (meeting?.status === "processing") {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-black text-center px-4">
@@ -214,11 +213,11 @@ function Report({ user, setUser }) {
       </div>
     );
 
-  // ✅ Main Report Content (Dark Mode)
+  // Main report layout
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-gray-100">
-      {/* Header */}
-      <header className="bg-gray-900/70 backdrop-blur-md border-b border-gray-700 shadow-md sticky top-0 z-10">
+      {/* Sticky Header */}
+      <header className="top-0 left-0 w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-700 shadow-md z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-indigo-400">{meeting.title}</h1>
@@ -266,58 +265,61 @@ function Report({ user, setUser }) {
                 Enable Share
               </button>
             )}
-            <button
+            {/* <button
               onClick={handleLogout}
               className="bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
             >
               Logout
-            </button>
+            </button> */}
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8 space-y-6">
+      {/* Main content */}
+      <main className="max-w-7xl mx-auto px-4 pt-24 pb-12 space-y-8 mt-[-49px]">
         {meeting.status === "failed" && (
           <div className="bg-red-900/40 border border-red-700 text-red-300 px-4 py-3 rounded-lg shadow">
             ❌ Processing failed. Please try uploading again.
           </div>
         )}
 
-        <div className="bg-gray-900/60 backdrop-blur-md rounded-xl border border-gray-700 p-6 shadow-lg transition hover:border-indigo-600">
+        {/* Summary */}
+        <section className="bg-gray-900/60 backdrop-blur-md rounded-xl border border-gray-700 p-6 shadow-lg hover:border-indigo-600 transition">
           <h2 className="text-xl font-bold text-indigo-400 mb-3">📝 Summary</h2>
           <p className="text-gray-300 leading-relaxed">
             {meeting.summary || "Summary will appear after processing is complete."}
           </p>
-        </div>
+        </section>
 
-        {meeting.tasks && meeting.tasks.length > 0 && (
-          <div className="bg-gray-900/60 backdrop-blur-md rounded-xl border border-gray-700 p-6 shadow-lg transition hover:border-indigo-600">
+        {/* Tasks */}
+        {meeting.tasks?.length > 0 && (
+          <section className="bg-gray-900/60 backdrop-blur-md rounded-xl border border-gray-700 p-6 shadow-lg hover:border-indigo-600 transition">
             <h2 className="text-xl font-bold text-indigo-400 mb-4">✅ Action Items</h2>
             <div className="space-y-3">
-              {meeting.tasks.map((task, i) => (
-                <div key={i} className={`rounded-lg p-4 ${getPriorityColor(task.priority)}`}>
+              {meeting.tasks.map((t, i) => (
+                <div key={i} className={`rounded-lg p-4 ${getPriorityColor(t.priority)}`}>
                   <div className="flex justify-between items-start mb-2">
-                    <p className="font-medium flex-1">{task.description}</p>
-                    <span className="text-xs font-bold uppercase ml-2">{task.priority}</span>
+                    <p className="font-medium flex-1">{t.description}</p>
+                    <span className="text-xs font-bold uppercase ml-2">{t.priority}</span>
                   </div>
                   <div className="text-sm flex gap-4 text-gray-400">
-                    <span>👤 {task.assignedTo}</span>
-                    <span>📅 {task.deadline}</span>
+                    <span>👤 {t.assignedTo}</span>
+                    <span>📅 {t.deadline}</span>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
+        {/* Transcript */}
         {meeting.transcript && (
-          <div className="bg-gray-900/60 backdrop-blur-md rounded-xl border border-gray-700 p-6 shadow-lg transition hover:border-indigo-600">
+          <section className="bg-gray-900/60 backdrop-blur-md rounded-xl border border-gray-700 p-6 shadow-lg hover:border-indigo-600 transition">
             <h2 className="text-xl font-bold text-indigo-400 mb-4">📄 Full Transcript</h2>
             <div className="bg-gray-800/70 rounded p-4 max-h-96 overflow-y-auto custom-scroll">
               <p className="whitespace-pre-wrap text-gray-300">{meeting.transcript}</p>
             </div>
-          </div>
+          </section>
         )}
       </main>
     </div>

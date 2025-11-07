@@ -1,18 +1,31 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import { useState, useEffect } from "react";
+
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Report from "./pages/Report";
 import PublicReport from "./pages/PublicReport";
+import AboutUs from "./pages/AboutUs";
+
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import HeroSection from "./components/HeroSection";
-import AudioUploader from "./components/AudioUploader"; // assuming you already have this
+import AudioUploader from "./components/AudioUploader";
 
-function App() {
+// 🔁 Inner App component to access useNavigate
+function AppContent() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     try {
@@ -27,53 +40,60 @@ function App() {
     }
   }, []);
 
+  if (loading) return null;
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/login");
+  };
+
   const PrivateRoute = ({ children }) => {
-    if (loading) return null; // wait for localStorage check
     return user ? children : <Navigate to="/login" />;
   };
 
-  // 🔐 Handler to require login before upload
-  const handleRequireLogin = () => {
-    if (!user) {
-      alert("Please sign in to upload your meeting recording.");
-      window.location.href = "/login";
-    }
-  };
-
-  if (loading) return null;
+  // 🧭 Hide header/footer on login/signup
+  const hideHeaderFooter = ["/login", "/signup"].includes(location.pathname);
 
   return (
-    <Router>
-      <div className="min-h-screen bg-[#0f172a] text-white flex flex-col">
-        {/* 🌐 Global Header */}
+    <div className="min-h-screen bg-[#0f172a] text-white flex flex-col">
+      {!hideHeaderFooter && (
         <Header
           user={user}
-          onLogout={() => {
-            localStorage.removeItem("user");
-            setUser(null);
-          }}
-          onSignIn={() => (window.location.href = "/login")}
-          onSignUp={() => (window.location.href = "/signup")}
-          onAbout={() => alert("About Us section coming soon!")}
+          onLogout={handleLogout}
+          onSignIn={() => navigate("/login")}
+          onSignUp={() => navigate("/signup")}
+          onHome={() => navigate(user ? "/dashboard" : "/")}
+          onAbout={() => navigate("/about")}
         />
+      )}
 
+      <main className={`${!hideHeaderFooter ? "pt-[72px]" : ""} flex-grow`}>
         <Routes>
-          {/* 🏠 Home Page (Dynamic) */}
+          {/* 🏠 Home Page */}
           <Route
             path="/"
             element={
               user ? (
-                <Dashboard user={user} setUser={setUser} />
+                <Navigate to="/dashboard" />
               ) : (
                 <>
-                  <HeroSection scrollToUploader={handleRequireLogin} />
+                  <HeroSection />
                   <div className="max-w-7xl mx-auto px-6 py-20">
-                    <AudioUploader onRequireLogin={handleRequireLogin} />
+                    <AudioUploader
+                      onRequireLogin={() => {
+                        alert("Please sign in to upload your meeting recording.");
+                        navigate("/login");
+                      }}
+                    />
                   </div>
                 </>
               )
             }
           />
+
+          {/* ℹ️ About Us */}
+          <Route path="/about" element={<AboutUs user={user} />} />
 
           {/* 🔐 Auth Pages */}
           <Route path="/login" element={<Login setUser={setUser} />} />
@@ -88,7 +108,6 @@ function App() {
               </PrivateRoute>
             }
           />
-
           <Route
             path="/report/:id"
             element={
@@ -98,18 +117,23 @@ function App() {
             }
           />
 
-          {/* 🌐 Public Report View */}
+          {/* 🌐 Public Report */}
           <Route path="/p/:token" element={<PublicReport />} />
 
           {/* 🚫 Redirect unknown routes */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
+      </main>
 
-        {/* 🧩 Footer (Visible to everyone) */}
-        <Footer />
-      </div>
-    </Router>
+      {!hideHeaderFooter && <Footer />}
+    </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+}

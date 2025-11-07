@@ -144,7 +144,8 @@ function AudioUploader({ onUploadSuccess }) {
       )}
 
       {/* 🔲 Dark Themed Main Uploader Container */}
-      <div className="bg-gray-900 border border-gray-700 shadow-2xl rounded-2xl p-8 mt-20 max-w-2xl mx-auto text-white">
+      <div className="bg-gray-900 border border-gray-700 shadow-lg rounded-2xl p-6 mt-6 max-w-2xl mx-auto text-white transition-all duration-300">
+
         <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
           📤 Upload Meeting Recording
         </h2>
